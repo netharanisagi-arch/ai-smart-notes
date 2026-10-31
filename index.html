@@ -36,12 +36,12 @@
   </section>
 </main>
 
-<footer>AI Smart Notes · v4</footer>
+<footer>AI Smart Notes · v5</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // මේකෙන් අපිට තේරෙයි කෝඩ් එක ලෝඩ් වුණාද කියලා
-  alert("1. Page Loaded! Script is running.");
+  // අපි මේකෙන් බලමු කෝඩ් එක වැඩ කරනවද කියලා
+  alert("1. Page Loaded Successfully!");
 
   const supabaseUrl = 'https://jaytarmjzginfdhuboai.supabase.co';
   const supabaseKey = 'sb_publishable_gc44J9OCEEz_fIExk-vTwA_zF7zU8ig';
@@ -53,84 +53,28 @@
     alert("2. Login button clicked!");
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    if(!email || !password) { alert("Email or Password is empty!"); return; }
+    if(!email || !password) { alert("Email or Password empty!"); return; }
     
-    alert("3. Trying to connect to Supabase...");
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      alert("Login Error: " + error.message);
-    } else {
-      alert("Login Successful!");
-    }
+    if (error) alert("Login Error: " + error.message);
+    else alert("Login Successful!");
   }
 
   async function signup() {
     alert("2. Sign Up button clicked!");
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    if(!email || !password) { alert("Email or Password is empty!"); return; }
+    if(!email || !password) { alert("Email or Password empty!"); return; }
     
-    alert("3. Trying to create account in Supabase...");
+    alert("3. Connecting to Supabase...");
     const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      alert("Signup Error: " + error.message);
-    } else {
-      alert("Signup Successful! Please try to Login now.");
-    }
+    if (error) alert("Signup Error: " + error.message);
+    else alert("Signup Successful! Please Login now.");
   }
 
   async function logout() {
     await supabase.auth.signOut();
     alert("Logged out!");
-  }
-
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (session) {
-      currentUser = session.user;
-      document.getElementById('auth-section').style.display = 'none';
-      document.getElementById('app-section').style.display = 'block';
-      document.getElementById('user-email').innerText = currentUser.email;
-      loadNotes();
-    } else {
-      currentUser = null;
-      document.getElementById('auth-section').style.display = 'block';
-      document.getElementById('app-section').style.display = 'none';
-    }
-  });
-
-  async function saveNote() {
-    if (!currentUser) { alert("Please login first!"); return; }
-    const title = document.getElementById('title').value;
-    const body = document.getElementById('body').value;
-    if (!title && !body) { alert("Cannot save empty note!"); return; }
-
-    document.getElementById('save-btn').innerText = "Saving...";
-    const { error } = await supabase.from('notes').insert([{ title, body, user_id: currentUser.id }]);
-    
-    if (error) {
-      alert("Error saving note: " + error.message);
-    } else {
-      document.getElementById('title').value = '';
-      document.getElementById('body').value = '';
-      loadNotes();
-      alert("Note Saved Successfully!");
-    }
-    document.getElementById('save-btn').innerText = "Save Note";
-  }
-
-  async function loadNotes() {
-    if (!currentUser) return;
-    const { data, error } = await supabase.from('notes').select('*').order('created_at', { ascending: false });
-    let box = document.getElementById('notes');
-    box.innerHTML = '';
-    if (data) {
-      data.forEach(n => {
-        let d = document.createElement('div');
-        d.className = 'note';
-        d.innerHTML = `<b>${n.title || 'Untitled'}</b><p>${n.body}</p><small>${new Date(n.created_at).toLocaleString()}</small>`;
-        box.append(d);
-      });
-    }
   }
 </script>
 </body></html>
