@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Smart Notes</title><style>
-:root{--bg:#080808;--panel:#171317;--pink:#ff5ca8;--white:#f7f4f6;--muted:#aaa1a8}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:16px system-ui,-apple-system,sans-serif}header{padding:22px 18px;border-bottom:1px solid #292229}.brand{font-weight:800;font-size:21px}.brand span{color:var(--pink)}.tag{color:var(--muted);font-size:12px}main{max-width:760px;margin:auto;padding:24px 16px 50px}.welcome h1{font-size:30px;margin:4px 0}.welcome p,.tile p{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:22px 0}.tile,.panel{background:var(--panel);border:1px solid #302630;border-radius:18px;padding:17px}.emoji{font-size:25px}button{background:var(--pink);color:#1b0711;border:0;border-radius:12px;padding:12px 16px;font-weight:750;cursor:pointer}.secondary{background:#302630;color:white;border:1px solid #493744}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}input,textarea{width:100%;background:#0d0b0d;border:1px solid #443541;color:white;border-radius:12px;padding:12px;font:inherit}textarea{min-height:130px;margin:10px 0}.note{padding:12px 0;border-top:1px solid #302630}.note small,.status{color:var(--pink)}footer{text-align:center;color:#776e75;font-size:12px;padding:20px}@media(max-width:480px){.grid{grid-template-columns:1fr 1fr}.tile{padding:14px}}
+:root{--bg:#080808;--panel:#171317;--pink:#ff5ca8;--white:#f7f4f6;--muted:#aaa1a8}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:16px system-ui,-apple-system,sans-serif}header{padding:22px 18px;border-bottom:1px solid #292229}.brand{font-weight:800;font-size:21px}.brand span{color:var(--pink)}.tag{color:var(--muted);font-size:12px}main{max-width:760px;margin:auto;padding:24px 16px 50px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:22px 0}.tile,.panel{background:var(--panel);border:1px solid #302630;border-radius:18px;padding:17px}.emoji{font-size:25px}button{background:var(--pink);color:#1b0711;border:0;border-radius:12px;padding:12px 16px;font-weight:750;cursor:pointer}.secondary{background:#302630;color:white;border:1px solid #493744}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}input,textarea{width:100%;background:#0d0b0d;border:1px solid #443541;color:white;border-radius:12px;padding:12px;font:inherit}textarea{min-height:130px;margin:10px 0}.note{padding:12px 0;border-top:1px solid #302630}.note small,.status{color:var(--pink)}footer{text-align:center;color:#776e75;font-size:12px;padding:20px}@media(max-width:480px){.grid{grid-template-columns:1fr 1fr}.tile{padding:14px}}
 .auth-box{max-width:400px;margin:50px auto;padding:20px;background:var(--panel);border-radius:18px;text-align:center}
 .auth-box input{margin-bottom:10px}
 #app-section{display:none}
@@ -9,65 +9,53 @@
   <div class="tag">Your thoughts, organized</div>
 </header>
 
-<!-- Login Section -->
 <section class="auth-box" id="auth-section">
   <h2>Welcome 👋</h2>
   <p style="color:var(--muted)">Login to save notes to the cloud</p>
   <input id="email" type="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
   <div class="actions" style="justify-content:center">
-    <button onclick="login()">Login</button>
-    <button class="secondary" onclick="signup()">Sign Up</button>
+    <button type="button" onclick="login()">Login</button>
+    <button type="button" class="secondary" onclick="signup()">Sign Up</button>
   </div>
-  <div id="auth-msg" style="margin-top:10px; color:var(--pink)"></div>
+  <div id="auth-msg" style="margin-top:10px; color:var(--pink); font-size:12px;"></div>
 </section>
 
-<!-- Main App Section -->
 <main id="app-section">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
     <div class="tag">Logged in as: <span id="user-email" style="color:white"></span></div>
-    <button class="secondary" style="padding:8px 12px; font-size:12px;" onclick="logout()">Logout</button>
+    <button type="button" class="secondary" style="padding:8px 12px; font-size:12px;" onclick="logout()">Logout</button>
   </div>
-
-  <section class="grid">
-    <div class="tile"><div class="emoji">🎙️</div><h3>Record Audio</h3><p>Record with your phone microphone.</p><div class="actions"><button onclick="startRec()">Start</button><button class="secondary" onclick="stopRec()">Stop</button></div><div id="status" class="status">Not recording</div></div>
-    <div class="tile"><div class="emoji">🎥</div><h3>Live Zoom Notes</h3><p>Zoom live connection planned.</p><div class="actions"><button class="secondary" onclick="alert('Zoom Live Notes coming soon!')">Connect Zoom</button></div></div>
-    <div class="tile"><div class="emoji">📁</div><h3>Upload Audio</h3><p>Choose an audio file.</p><input type="file" accept="audio/*"></div>
-    <div class="tile"><div class="emoji">📝</div><h3>My Notes</h3><p>Write and save notes to cloud.</p><button onclick="document.getElementById('editor').scrollIntoView({behavior:'smooth'})">Open Notes</button></div>
-  </section>
   
   <section class="panel" id="editor">
     <h2>✍️ Quick Note</h2>
     <input id="title" placeholder="Note title">
     <textarea id="body" placeholder="Write your notes here..."></textarea>
-    <div class="actions"><button onclick="saveNote()" id="save-btn">Save Note</button></div>
+    <div class="actions"><button type="button" onclick="saveNote()" id="save-btn">Save Note</button></div>
     <div id="notes"></div>
   </section>
 </main>
 
-<footer>AI Smart Notes · v3 · Supabase Connected</footer>
+<footer>AI Smart Notes · v4</footer>
 
-<!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // මේකෙන් අපිට තේරෙයි කෝඩ් එක ලෝඩ් වුණාද කියලා
+  alert("1. Page Loaded! Script is running.");
+
   const supabaseUrl = 'https://jaytarmjzginfdhuboai.supabase.co';
   const supabaseKey = 'sb_publishable_gc44J9OCEEz_fIExk-vTwA_zF7zU8ig';
-  
-  let supabase;
-  try {
-    supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-  } catch(e) {
-    alert("Supabase Load Error: " + e.message);
-  }
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
   let currentUser = null;
-  let rec, chunks = [];
 
   async function login() {
+    alert("2. Login button clicked!");
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    if(!email || !password) { alert("Email සහ Password දෙකම දාන්න!"); return; }
+    if(!email || !password) { alert("Email or Password is empty!"); return; }
     
+    alert("3. Trying to connect to Supabase...");
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       alert("Login Error: " + error.message);
@@ -77,15 +65,17 @@
   }
 
   async function signup() {
+    alert("2. Sign Up button clicked!");
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    if(!email || !password) { alert("Email සහ Password දෙකම දාන්න!"); return; }
+    if(!email || !password) { alert("Email or Password is empty!"); return; }
     
+    alert("3. Trying to create account in Supabase...");
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
       alert("Signup Error: " + error.message);
     } else {
-      alert("Signup Successful! දැන් Login වෙන්න.");
+      alert("Signup Successful! Please try to Login now.");
     }
   }
 
@@ -109,10 +99,10 @@
   });
 
   async function saveNote() {
-    if (!currentUser) { alert("මුලින්ම Login වෙන්න ඕනේ!"); return; }
+    if (!currentUser) { alert("Please login first!"); return; }
     const title = document.getElementById('title').value;
     const body = document.getElementById('body').value;
-    if (!title && !body) { alert("හිස්ව save කරන්න බෑ!"); return; }
+    if (!title && !body) { alert("Cannot save empty note!"); return; }
 
     document.getElementById('save-btn').innerText = "Saving...";
     const { error } = await supabase.from('notes').insert([{ title, body, user_id: currentUser.id }]);
@@ -140,32 +130,6 @@
         d.innerHTML = `<b>${n.title || 'Untitled'}</b><p>${n.body}</p><small>${new Date(n.created_at).toLocaleString()}</small>`;
         box.append(d);
       });
-    }
-  }
-
-  async function startRec() {
-    try {
-      let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      chunks = [];
-      rec = new MediaRecorder(stream);
-      rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data) };
-      rec.onstop = () => {
-        let a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob(chunks, { type: 'audio/webm' }));
-        a.download = 'smart-notes-recording.webm';
-        a.click();
-        stream.getTracks().forEach(t => t.stop());
-      };
-      rec.start();
-      document.getElementById('status').textContent = 'Recording…';
-    } catch (e) {
-      alert("Microphone Error: " + e.message);
-    }
-  }
-  function stopRec() {
-    if (rec && rec.state === 'recording') {
-      rec.stop();
-      document.getElementById('status').textContent = 'Recording downloaded';
     }
   }
 </script>
