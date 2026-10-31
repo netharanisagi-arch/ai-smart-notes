@@ -50,35 +50,50 @@
 <!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Supabase Configuration
   const supabaseUrl = 'https://jaytarmjzginfdhuboai.supabase.co';
   const supabaseKey = 'sb_publishable_gc44J9OCEEz_fIExk-vTwA_zF7zU8ig';
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  
+  let supabase;
+  try {
+    supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  } catch(e) {
+    alert("Supabase Load Error: " + e.message);
+  }
 
   let currentUser = null;
   let rec, chunks = [];
 
-  // Auth Functions
   async function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    if(!email || !password) { alert("Email සහ Password දෙකම දාන්න!"); return; }
+    
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) document.getElementById('auth-msg').innerText = error.message;
+    if (error) {
+      alert("Login Error: " + error.message);
+    } else {
+      alert("Login Successful!");
+    }
   }
 
   async function signup() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    if(!email || !password) { alert("Email සහ Password දෙකම දාන්න!"); return; }
+    
     const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) document.getElementById('auth-msg').innerText = error.message;
-    else document.getElementById('auth-msg').innerText = "Check your email for confirmation link!";
+    if (error) {
+      alert("Signup Error: " + error.message);
+    } else {
+      alert("Signup Successful! දැන් Login වෙන්න.");
+    }
   }
 
   async function logout() {
     await supabase.auth.signOut();
+    alert("Logged out!");
   }
 
-  // Check Auth State
   supabase.auth.onAuthStateChange((event, session) => {
     if (session) {
       currentUser = session.user;
@@ -93,21 +108,22 @@
     }
   });
 
-  // Notes Functions
   async function saveNote() {
-    if (!currentUser) return;
+    if (!currentUser) { alert("මුලින්ම Login වෙන්න ඕනේ!"); return; }
     const title = document.getElementById('title').value;
     const body = document.getElementById('body').value;
-    if (!title && !body) return;
+    if (!title && !body) { alert("හිස්ව save කරන්න බෑ!"); return; }
 
     document.getElementById('save-btn').innerText = "Saving...";
     const { error } = await supabase.from('notes').insert([{ title, body, user_id: currentUser.id }]);
     
-    if (error) alert("Error saving: " + error.message);
-    else {
+    if (error) {
+      alert("Error saving note: " + error.message);
+    } else {
       document.getElementById('title').value = '';
       document.getElementById('body').value = '';
       loadNotes();
+      alert("Note Saved Successfully!");
     }
     document.getElementById('save-btn').innerText = "Save Note";
   }
@@ -127,7 +143,6 @@
     }
   }
 
-  // Audio Recording
   async function startRec() {
     try {
       let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -144,7 +159,7 @@
       rec.start();
       document.getElementById('status').textContent = 'Recording…';
     } catch (e) {
-      document.getElementById('status').textContent = 'Microphone blocked';
+      alert("Microphone Error: " + e.message);
     }
   }
   function stopRec() {
