@@ -1,11 +1,157 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Smart Notes</title><style>
 :root{--bg:#080808;--panel:#171317;--pink:#ff5ca8;--white:#f7f4f6;--muted:#aaa1a8}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:16px system-ui,-apple-system,sans-serif}header{padding:22px 18px;border-bottom:1px solid #292229}.brand{font-weight:800;font-size:21px}.brand span{color:var(--pink)}.tag{color:var(--muted);font-size:12px}main{max-width:760px;margin:auto;padding:24px 16px 50px}.welcome h1{font-size:30px;margin:4px 0}.welcome p,.tile p{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:22px 0}.tile,.panel{background:var(--panel);border:1px solid #302630;border-radius:18px;padding:17px}.emoji{font-size:25px}button{background:var(--pink);color:#1b0711;border:0;border-radius:12px;padding:12px 16px;font-weight:750;cursor:pointer}.secondary{background:#302630;color:white;border:1px solid #493744}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}input,textarea{width:100%;background:#0d0b0d;border:1px solid #443541;color:white;border-radius:12px;padding:12px;font:inherit}textarea{min-height:130px;margin:10px 0}.note{padding:12px 0;border-top:1px solid #302630}.note small,.status{color:var(--pink)}footer{text-align:center;color:#776e75;font-size:12px;padding:20px}@media(max-width:480px){.grid{grid-template-columns:1fr 1fr}.tile{padding:14px}}
-</style></head><body><header><div class="brand">✦ AI <span>Smart Notes</span></div><div class="tag">Your thoughts, organized</div></header><main><section class="welcome"><div class="tag">WELCOME</div><h1>Make every moment count.</h1><p>Capture ideas, organize notes, and keep everything in one place.</p></section><section class="grid">
-<div class="tile"><div class="emoji">🎙️</div><h3>Record Audio</h3><p>Record with your phone microphone.</p><div class="actions"><button onclick="startRec()">Start</button><button class="secondary" onclick="stopRec()">Stop</button></div><div id="status" class="status">Not recording</div></div>
-<div class="tile"><div class="emoji">🎥</div><h3>Live Zoom Notes</h3><p>Zoom live connection planned.</p><div class="actions"><button class="secondary" onclick="alert('Zoom Live Notes needs an approved Zoom integration and secure backend. This starter is not connected to Zoom yet.')">Connect Zoom</button></div></div>
-<div class="tile"><div class="emoji">📁</div><h3>Upload Audio</h3><p>Choose an audio file.</p><input type="file" accept="audio/*"></div>
-<div class="tile"><div class="emoji">📝</div><h3>My Notes</h3><p>Write and save notes on this device.</p><button onclick="document.getElementById('editor').scrollIntoView({behavior:'smooth'})">Open Notes</button></div></section>
-<section class="panel" id="editor"><h2>✍️ Quick Note</h2><input id="title" placeholder="Note title"><textarea id="body" placeholder="Write your notes here..."></textarea><div class="actions"><button onclick="saveNote()">Save Note</button><button class="secondary" onclick="exportTxt()">Export TXT</button></div><div id="notes"></div></section></main><footer>AI Smart Notes · Starter version · Notes stay on this device</footer>
+.auth-box{max-width:400px;margin:50px auto;padding:20px;background:var(--panel);border-radius:18px;text-align:center}
+.auth-box input{margin-bottom:10px}
+#app-section{display:none}
+</style></head><body>
+<header>
+  <div class="brand">✦ AI <span>Smart Notes</span></div>
+  <div class="tag">Your thoughts, organized</div>
+</header>
+
+<!-- Login Section -->
+<section class="auth-box" id="auth-section">
+  <h2>Welcome 👋</h2>
+  <p style="color:var(--muted)">Login to save notes to the cloud</p>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <div class="actions" style="justify-content:center">
+    <button onclick="login()">Login</button>
+    <button class="secondary" onclick="signup()">Sign Up</button>
+  </div>
+  <div id="auth-msg" style="margin-top:10px; color:var(--pink)"></div>
+</section>
+
+<!-- Main App Section -->
+<main id="app-section">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <div class="tag">Logged in as: <span id="user-email" style="color:white"></span></div>
+    <button class="secondary" style="padding:8px 12px; font-size:12px;" onclick="logout()">Logout</button>
+  </div>
+
+  <section class="grid">
+    <div class="tile"><div class="emoji">🎙️</div><h3>Record Audio</h3><p>Record with your phone microphone.</p><div class="actions"><button onclick="startRec()">Start</button><button class="secondary" onclick="stopRec()">Stop</button></div><div id="status" class="status">Not recording</div></div>
+    <div class="tile"><div class="emoji">🎥</div><h3>Live Zoom Notes</h3><p>Zoom live connection planned.</p><div class="actions"><button class="secondary" onclick="alert('Zoom Live Notes coming soon!')">Connect Zoom</button></div></div>
+    <div class="tile"><div class="emoji">📁</div><h3>Upload Audio</h3><p>Choose an audio file.</p><input type="file" accept="audio/*"></div>
+    <div class="tile"><div class="emoji">📝</div><h3>My Notes</h3><p>Write and save notes to cloud.</p><button onclick="document.getElementById('editor').scrollIntoView({behavior:'smooth'})">Open Notes</button></div>
+  </section>
+  
+  <section class="panel" id="editor">
+    <h2>✍️ Quick Note</h2>
+    <input id="title" placeholder="Note title">
+    <textarea id="body" placeholder="Write your notes here..."></textarea>
+    <div class="actions"><button onclick="saveNote()" id="save-btn">Save Note</button></div>
+    <div id="notes"></div>
+  </section>
+</main>
+
+<footer>AI Smart Notes · v3 · Supabase Connected</footer>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-let rec,chunks=[];async function startRec(){try{let stream=await navigator.mediaDevices.getUserMedia({audio:true});chunks=[];rec=new MediaRecorder(stream);rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};rec.onstop=()=>{let a=document.createElement('a');a.href=URL.createObjectURL(new Blob(chunks,{type:'audio/webm'}));a.download='smart-notes-recording.webm';a.click();stream.getTracks().forEach(t=>t.stop())};rec.start();document.getElementById('status').textContent='Recording…'}catch(e){document.getElementById('status').textContent='Microphone permission unavailable'}}function stopRec(){if(rec&&rec.state==='recording'){rec.stop();document.getElementById('status').textContent='Recording downloaded'}}function getNotes(){try{return JSON.parse(localStorage.getItem('smartNotes')||'[]')}catch(e){return []}}function render(){let box=document.getElementById('notes');box.innerHTML='';getNotes().reverse().forEach(n=>{let d=document.createElement('div');d.className='note';let b=document.createElement('b');b.textContent=n.title||'Untitled';let p=document.createElement('p');p.textContent=n.body;let s=document.createElement('small');s.textContent=n.date;d.append(b,p,s);box.append(d)})}function saveNote(){let t=document.getElementById('title').value,b=document.getElementById('body').value;if(!t&&!b)return;let a=getNotes();a.push({title:t,body:b,date:new Date().toLocaleString()});localStorage.setItem('smartNotes',JSON.stringify(a));document.getElementById('title').value='';document.getElementById('body').value='';render()}function exportTxt(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([document.getElementById('title').value+'\n\n'+document.getElementById('body').value],{type:'text/plain'}));a.download='my-note.txt';a.click()}render();
-</script></body></html>
+  // Supabase Configuration
+  const supabaseUrl = 'https://jaytarmjzginfdhuboai.supabase.co';
+  const supabaseKey = 'sb_publishable_gc44J9OCEEz_fIExk-vTwA_zF7zU8ig';
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  let currentUser = null;
+  let rec, chunks = [];
+
+  // Auth Functions
+  async function login() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) document.getElementById('auth-msg').innerText = error.message;
+  }
+
+  async function signup() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) document.getElementById('auth-msg').innerText = error.message;
+    else document.getElementById('auth-msg').innerText = "Check your email for confirmation link!";
+  }
+
+  async function logout() {
+    await supabase.auth.signOut();
+  }
+
+  // Check Auth State
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+      currentUser = session.user;
+      document.getElementById('auth-section').style.display = 'none';
+      document.getElementById('app-section').style.display = 'block';
+      document.getElementById('user-email').innerText = currentUser.email;
+      loadNotes();
+    } else {
+      currentUser = null;
+      document.getElementById('auth-section').style.display = 'block';
+      document.getElementById('app-section').style.display = 'none';
+    }
+  });
+
+  // Notes Functions
+  async function saveNote() {
+    if (!currentUser) return;
+    const title = document.getElementById('title').value;
+    const body = document.getElementById('body').value;
+    if (!title && !body) return;
+
+    document.getElementById('save-btn').innerText = "Saving...";
+    const { error } = await supabase.from('notes').insert([{ title, body, user_id: currentUser.id }]);
+    
+    if (error) alert("Error saving: " + error.message);
+    else {
+      document.getElementById('title').value = '';
+      document.getElementById('body').value = '';
+      loadNotes();
+    }
+    document.getElementById('save-btn').innerText = "Save Note";
+  }
+
+  async function loadNotes() {
+    if (!currentUser) return;
+    const { data, error } = await supabase.from('notes').select('*').order('created_at', { ascending: false });
+    let box = document.getElementById('notes');
+    box.innerHTML = '';
+    if (data) {
+      data.forEach(n => {
+        let d = document.createElement('div');
+        d.className = 'note';
+        d.innerHTML = `<b>${n.title || 'Untitled'}</b><p>${n.body}</p><small>${new Date(n.created_at).toLocaleString()}</small>`;
+        box.append(d);
+      });
+    }
+  }
+
+  // Audio Recording
+  async function startRec() {
+    try {
+      let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunks = [];
+      rec = new MediaRecorder(stream);
+      rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data) };
+      rec.onstop = () => {
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob(chunks, { type: 'audio/webm' }));
+        a.download = 'smart-notes-recording.webm';
+        a.click();
+        stream.getTracks().forEach(t => t.stop());
+      };
+      rec.start();
+      document.getElementById('status').textContent = 'Recording…';
+    } catch (e) {
+      document.getElementById('status').textContent = 'Microphone blocked';
+    }
+  }
+  function stopRec() {
+    if (rec && rec.state === 'recording') {
+      rec.stop();
+      document.getElementById('status').textContent = 'Recording downloaded';
+    }
+  }
+</script>
+</body></html>
